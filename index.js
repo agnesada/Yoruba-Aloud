@@ -178,3 +178,18 @@ function dashboardApi(){
     // dashboardApi  
 
 }
+
+
+// function for log out
+
+function logout(){
+    Swal.fire({
+        icon: 'Success',
+        text: 'Login successful',
+        confirmButtonColor: '#2D85DE'
+    }) 
+    setTimeout(() => {
+        localStorage.clear();
+        location.href = "index.html"
+    }, 3000)
+}
