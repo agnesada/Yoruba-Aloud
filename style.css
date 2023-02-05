@@ -876,7 +876,7 @@ hr {
     font-size: 12px;
 }
 
-.spin {
+.spin, .spin2 {
     display: none;
 }
 
@@ -956,9 +956,15 @@ hr {
 
 .catImage{
     width: 100%;
+    border-radius: 14px;
 }
 
 
 .textId{
     font-size: 24px;
+}
+
+.categorySubBody{
+    text-align: right;
+    
 }

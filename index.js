@@ -136,13 +136,6 @@ function logIn(event){
 }
 
 
-// function adminIdName(){
-//     const adminName = document.getElementById("adminId");
-//     adminIdName.style.display = "block"
-
-// }
-// adminName.innerHTML = 
-
 //function for dashboard APIs
 
 function dashboardApi(){
@@ -190,12 +183,12 @@ function dashboardApi(){
     .catch(error => console.log('error', error));  
  
 }
-    dashboardApi();
+dashboardApi();
 
     
-    // function for studentModal
+// function for studentModal
 
-    function studentModal(event){
+function studentModal(event){
     event.preventDefault();
     const myModal = document.querySelector(".mymodal");
     myModal.style.display = "block";
@@ -264,26 +257,9 @@ function closeDashModal() {
     const closeModal = document.getElementById("dash-modal");
     closeModal.style.display = "none"
 }
-      
-     
-    
-
-// function for log out
-
-function logout(){
-    Swal.fire({
-        icon: 'Success',
-        text: 'Login successful',
-        confirmButtonColor: '#2D85DE'
-    }) 
-    setTimeout(() => {
-        localStorage.clear();
-        location.href = "index.html"
-    }, 3000)
-}
 
 
-// function for table data 
+// function for load table data 
 
 function loadTable(){
     const dashboardTable = document.getElementById("table-id");
@@ -339,7 +315,7 @@ function createCat(){
     const token = theToken.token; 
     
     const allCategory = new Headers();
-        allCategory.append("Authorization", `Bearer ${token}`);
+    allCategory.append("Authorization", `Bearer ${token}`);
 
     const enterCategory = document.querySelector('#enterCat').value;
     const uploadDoc = document.querySelector('#uploadFile').files[0];
@@ -348,7 +324,7 @@ function createCat(){
 
     if (enterCategory === "" || uploadDoc === ""){
         Swal.fire({
-            icon: 'info',
+            icon: 'success',
             text: 'All fields are required!',
             confirmButtonColor: '#2D85DE'
         })
@@ -383,7 +359,7 @@ function createCat(){
             }
             else {
                 Swal.fire({
-                    Icon: 'info',
+                    icon: 'error',
                     text: 'Failed to Create Category!',
                     confirmButtonColor: '#2D85DE'
                 })
@@ -397,6 +373,8 @@ function createCat(){
 }
 
 
+// function for display catgory
+
 function displayCategory(){
     const myToken = localStorage.getItem("admin");
     const theToken = JSON.parse(myToken);
@@ -404,8 +382,7 @@ function displayCategory(){
 
     const catList = new Headers();
     catList.append("Authorization", `Bearer ${token}`);
-        
-
+      
     const data = {
         method: 'GET',
         headers: catList,
@@ -423,13 +400,13 @@ function displayCategory(){
             result.map((item) => {
                 categoryData += 
                 `<div class="search-card">
-                    <div class="theItem">
+                    <div class="categorySubBody">
                         <img src= ${item.image} alt="" class ="catImage">  
                     </div>
                     <p>${item.name}</p>
-                    <div class="theItem">
-                        <button class="button button-red font-weight-700" type="button" onclick="updateCategory" ${item.id}>Update</button>
-                        <button class="button button-blue2 font-weight-700" type="button" onclick="deleteCategory" ${item.id}>Delete</button>
+                    <div class="categorySubBody">
+                        <button class="button button-red font-weight-700" type="button" onclick = "openCategory(${item.id})" >Update</button>
+                        <button  class="button button-blue2 font-weight-700" type="button" onclick = "deleteCategory(${item.id})" >Delete</button>
                     </div>
                 </div>`
 
@@ -442,5 +419,255 @@ function displayCategory(){
     .catch(error => console.log('error', error));
 }
 
-displayCategory()
+displayCategory();
 
+
+//  function for delete category
+
+function deleteCategory(myid) {
+    const getToken = localStorage.getItem('admin');
+    const token = JSON.parse(getToken);
+    const myToken = token.token;
+    const listHeaders = new Headers();
+    listHeaders.append("Authorization", `Bearer ${myToken}`);
+    const delReq = {
+        method: 'GET',
+        headers: listHeaders
+    }
+    const url = `https://pluralcodesandbox.com/yorubalearning/api/admin/delete_category/${myid}`;
+    fetch(url, delReq)
+    .then(response => response.json())
+    .then(result => {
+        console.log(result)
+        if (result.status === "success") {
+            Swal.fire({
+                icon: 'success',
+                text: `${result.message}`,
+                confirmButtonColor: "#2D85DE"
+            })
+            setTimeout(() => {
+                location.reload();
+            }, 3000)
+        }
+        else {
+            Swal.fire({
+                icon: 'info',
+                text: 'Unsuccessful',
+                confirmButtonColor: "#2D85DE"
+            })
+        }
+    })
+    .catch(error => console.log('error', error));
+}
+
+
+let uniqueId;
+function openCategory(modalId) {
+    localStorage.setItem("id", modalId)
+
+    const myModal = document.getElementById("mymodal3");
+    myModal.style.display = "block";
+
+    const getToken = localStorage.getItem('admin');
+    const token = JSON.parse(getToken);
+    const myToken = token.token;
+
+    const catHeader = new Headers();
+    catHeader.append("Authorization", `Bearer ${myToken}`);
+
+    uniqueId = modalId
+
+    const upReq = {
+        method: 'GET',
+        headers: catHeader
+    }
+
+    const url =  `https://pluralcodesandbox.com/yorubalearning/api/admin/get_details?category_id=${uniqueId}`;
+
+    fetch(url, upReq)
+    .then(response => response.json())
+    .then(result => {
+        console.log(result)
+        const getUpName = document.getElementById("updateName")
+        const getUpImg = document.getElementById("updateNameImage")
+
+        getUpName.setAttribute('value', `${result.name}`);
+        getUpImg.setAttribute('value', `${result.image}`)
+
+        })
+    .catch(error => console.log('error', error));
+ }
+
+
+ function chooseImg(event) {
+    event.preventDefault();
+    
+    const div1 = document.querySelector(".getWrapp")
+    const div2 = document.querySelector(".wrapper")
+
+    div1.style.display = "none";
+    div2.style.display = "block";
+ }
+
+ function updateCategory(event){
+    event.preventDefault();
+
+    const getSpin = document.querySelector(".spin2");
+    getSpin.style.display = "inline-block";
+
+    const getUpname = document.getElementById("updateName").value;
+    const getUimg1 = document.getElementById("updateNameImage").value;
+    const getUimg2 = document.getElementById("updateImage").files[0];
+    const getId = localStorage.getItem("id");
+
+    if (getUpname === "") {
+        Swal.fire({
+            icon: 'info',
+            text: 'the name field is required!',
+            confirmButtonColor: "#2D85DE"
+        })
+        getSpin.style.display = "none";
+    }
+    else {
+        const getToken = localStorage.getItem('admin');
+        const token = JSON.parse(getToken);
+        const myToken = token.token;
+
+        const listHeaders = new Headers();
+        listHeaders.append("Authorization", `Bearer ${myToken}`);
+
+        const upFormData = new FormData();
+        upFormData.append("name", getUpname);
+        upFormData.append("image", getUimg1);
+        upFormData.append("image", getUimg2);
+        upFormData.append("category_id", getId);
+
+        const upReq = {
+            method: 'POST',
+            headers: listHeaders,
+            body: upFormData
+        };
+
+        const url = "https://pluralcodesandbox.com/yorubalearning/api/admin/update_category";
+
+        fetch(url, upReq)
+        .then(response => response.json())
+        .then(result => {
+            console.log(result)
+            if (result.status === "success") {
+                Swal.fire({
+                    icon: 'success',
+                    text: `${result.message}`,
+                    confirmButtonColor: '#2D85DE'
+                })
+                setTimeout(() => {
+                    location.reload();
+                }, 3000)
+            }
+            else{
+                Swal.fire({
+                    icon: 'info',
+                    text: 'Unsuccessful!',
+                    confirmButtonColor: '#2D85DE'
+                })
+                getSpin.style.display = "none";
+            }
+        })
+        .catch(error => console.log('error', error));
+    }
+}
+
+ function closeModal3() {
+    const myModal = document.getElementById("mymodal3");
+    myModal.style.display = "none";
+ }
+
+//  function for update emailand name
+
+function upDateAdmin(event){
+    event.preventDefault();
+
+    // const getSpin = document.querySelector(".spin2");
+    // getSpin.style.display = "inline-block";
+
+    const getUpname = document.getElementById("updateName").value;
+    const getUpemail = document.getElementById("updateEmail").value;
+
+    if (getUpname === "" & getUpemail === "") {
+        Swal.fire({
+            icon: 'info',
+            text: 'All the fields are required!',
+            confirmButtonColor: "#2D85DE"
+        })
+        getSpin.style.display = "none";
+    }
+    else {
+        const getToken = localStorage.getItem('admin');
+        const token = JSON.parse(getToken);
+        const myToken = token.token;
+
+        const upForm = new FormData();
+        upForm.append("Authorization", `Bearer ${myToken}`);
+
+        const updateFormData = new FormData();
+        updateFormData.append("name", getUpname);
+        updateFormData.append("email", getUpemail);
+
+        const upReq = {
+            method: 'POST',
+            headers: upForm,
+            body: updateFormData
+        };
+
+        const url = "https://pluralcodesandbox.com/yorubalearning/api/admin/admin_update_profile";
+
+        fetch(url, upReq)
+        .then(response => response.json())
+        .then(result => {
+            console.log(result)
+            if (result.status === "success") {
+                Swal.fire({
+                    icon: 'success',
+                    text: `${result.message}`,
+                    confirmButtonColor: '#2D85DE'
+                })
+                setTimeout(() => {
+                    location.reload();
+                }, 3000)
+            }
+            else{
+                Swal.fire({
+                    icon: 'info',
+                    text: 'Unsuccessful!',
+                    confirmButtonColor: '#2D85DE'
+                })
+                getSpin.style.display = "none";
+            }
+        })
+        .catch(error => console.log('error', error));
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function for log out
+
+function logout(){
+    setTimeout(() => {
+        localStorage.clear();
+        location.href = "index.html"
+    }, 1000)
+}
