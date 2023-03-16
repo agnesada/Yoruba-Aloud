@@ -681,7 +681,7 @@ function displaySubCategoryList(){
     const data = {
         method: 'GET',
         headers: SubcatList,
-        body: 
+        body: formdata
 
     }
 
@@ -851,21 +851,6 @@ function upDatePassword(event){
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
