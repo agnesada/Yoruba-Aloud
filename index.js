@@ -401,7 +401,7 @@ function displayCategory(){
                 categoryData += 
                 `<div class="search-card">
                     <div class="categorySubBody">
-                        <img src= ${item.image} alt="" class ="catImage">  
+                        <a href="details.html?id=${item.id}&name=${item.name}"><img src= ${item.image} alt="" class ="catImage"></a>
                     </div>
                     <p>${item.name}</p>
                     <div class="categorySubBody">
@@ -582,13 +582,149 @@ function openCategory(modalId) {
     myModal.style.display = "none";
  }
 
-//  function for update emailand name
+//  function for get item for create sub category
+
+function getItemNId(){
+    const myParams = new URLSearchParams(window.location.search);
+    let subCategoryName = myParams.get('name');
+
+    const displayCatName = document.querySelector(".det");
+    displayCatName.innerHTML = subCategoryName;
+}
+
+
+// function for details 
+
+function subCategory(event){
+    event.preventDefault();
+
+    // const getSpin = document.querySelector(".spin");
+    // getSpin.style.display = "inline-block";
+
+    const myParams = new URLSearchParams(window.location.search);
+    let subCategoryName = myParams.get('id');
+    console.log(subCategoryName);
+
+
+    const getSubCategoryName = document.querySelector('#subCatName').value;
+    const getSubCategoryImg = document.querySelector('#subCatImg').files[0];
+    
+
+    if (getSubCategoryName === "" || getSubCategoryImg === ""){
+        Swal.fire({
+            icon: 'warning',
+            text: 'All fields are required!',
+            confirmButtonColor: '#2D85DE'
+        })
+        // getSpin.style.display = "none";
+    }
+    
+
+    else{
+
+        const myToken = localStorage.getItem("admin");
+        const theToken = JSON.parse(myToken);
+        const token = theToken.token; 
+    
+        const subCategory = new Headers();
+        subCategory.append("Authorization", `Bearer ${token}`);
+
+        const createForm = new FormData();
+        createForm.append("name", getSubCategoryName);
+        createForm.append("image", getSubCategoryImg);
+        createForm.append("category_id", subCategoryName);
+
+
+        const createReq = {
+            method: 'POST',
+            headers:  subCategory,
+            body: createForm
+        }
+
+        const url = "https://pluralcodesandbox.com/yorubalearning/api/admin/create_subcategory";
+        
+        fetch(url, createReq)
+        .then(response => response.json())
+        .then(result => {
+            console.log(result)
+            if (result.status === "success") {
+                Swal.fire({
+                    icon: 'success',
+                    text: `${result.message}`,
+                    confirmButtonColor: '#2D85DE'
+                })
+
+
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Failed to Create Category!',
+                    confirmButtonColor: '#2D85DE'
+                })
+                // getSpin.style.display = "none";
+            }
+        })
+        .catch(error => console.log('error', error));
+    }
+    
+}
+
+function displaySubCategoryList(){
+    const myToken = localStorage.getItem("admin");
+    const theToken = JSON.parse(myToken);
+    const token = theToken.token; 
+
+    const SubcatList = new Headers();
+    SubcatList.append("Authorization", `Bearer ${token}`);
+      
+    const data = {
+        method: 'GET',
+        headers: SubcatList,
+        body: 
+
+    }
+
+    let categoryData = []
+    const url = "https://pluralcodesandbox.com/yorubalearning/api/admin/category_list"
+
+    fetch(url, data)
+    .then(response => response.json())
+    .then(result => {
+        console.log(result)
+        const getCategoryList = document.querySelector(".allCategories");
+            result.map((item) => {
+                categoryData += 
+                `<div class="search-card">
+                    <div class="categorySubBody">
+                        <a href="details.html?id=${item.id}&name=${item.name}"><img src= ${item.image} alt="" class ="catImage"></a>
+                    </div>
+                    <p>${item.name}</p>
+                    <div class="categorySubBody">
+                        <button class="button button-red font-weight-700" type="button" onclick = "openCategory(${item.id})" >Update</button>
+                        <button  class="button button-blue2 font-weight-700" type="button" onclick = "deleteCategory(${item.id})" >Delete</button>
+                    </div>
+                </div>`
+
+            })
+            getCategoryList.innerHTML = categoryData; 
+            console.log(getCategoryList);
+        
+
+    })
+    .catch(error => console.log('error', error));
+}
+
+displaySunbCategory();   
+
+
+ //  function for update email and name
 
 function upDateAdmin(event){
     event.preventDefault();
 
-    // const getSpin = document.querySelector(".spin2");
-    // getSpin.style.display = "inline-block";
+    const getSpin = document.querySelector(".spin2");
+    getSpin.style.display = "inline-block";
 
     const getUpname = document.getElementById("updateName").value;
     const getUpemail = document.getElementById("updateEmail").value;
@@ -606,7 +742,7 @@ function upDateAdmin(event){
         const token = JSON.parse(getToken);
         const myToken = token.token;
 
-        const upForm = new FormData();
+        const upForm = new Headers();
         upForm.append("Authorization", `Bearer ${myToken}`);
 
         const updateFormData = new FormData();
@@ -637,7 +773,7 @@ function upDateAdmin(event){
             }
             else{
                 Swal.fire({
-                    icon: 'info',
+                    icon: 'error',
                     text: 'Unsuccessful!',
                     confirmButtonColor: '#2D85DE'
                 })
@@ -649,6 +785,77 @@ function upDateAdmin(event){
 
 
 }
+
+// function for UpDate Password
+
+function upDatePassword(event){
+    event.preventDefault();
+   
+    const getCurrentEmail = document.getElementById("updatePassEmail").value;
+    const getNewPassword = document.getElementById("updatePassword").value;
+    const getConfirmPassword = document.getElementById("confirmPassword").value;
+
+    if (getCurrentEmail === ""|| getNewPassword === "" || getConfirmPassword === "") {
+        Swal.fire({
+            icon: 'info',
+            text: 'All the fields are required!',
+            confirmButtonColor: "#2D85DE"
+        })
+        getSpin.style.display = "none";
+    }
+    else {
+        const getToken = localStorage.getItem('admin');
+        const token = JSON.parse(getToken);
+        const myToken = token.token;
+
+        const createForm = new FormData();
+        createForm.append("Authorization", `Bearer ${myToken}`);
+
+        const createFormData = new FormData();
+        createFormData.append("email", getCurrentEmail);
+        createFormData.append("password", getNewPassword);
+        createFormData.append("password_confirmation", getConfirmPassword);
+
+        const createReq = {
+            method: 'POST',
+            headers: createForm,
+            body: createFormData
+        };
+
+        const url = "https://pluralcodesandbox.com/yorubalearning/api/admin/admin_update_password";
+
+        fetch(url, createReq)
+        .then(response => response.json())
+        .then(result => {
+            console.log(result)
+            if (result.status === "success") {
+                Swal.fire({
+                    icon: 'success',
+                    text: `${result.message}`,
+                    confirmButtonColor: '#2D85DE'
+                })
+                setTimeout(() => {
+                    location.reload();
+                }, 3000)
+            }
+            else{
+                Swal.fire({
+                    icon: 'info',
+                    text: 'Unsuccessful!',
+                    confirmButtonColor: '#2D85DE'
+                })
+                // getSpin.style.display = "none";
+            }
+        })
+        .catch(error => console.log('error', error));
+    }
+
+}
+
+
+
+
+
 
 
 
