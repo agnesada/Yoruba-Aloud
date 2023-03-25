@@ -935,7 +935,9 @@ hr {
 
 .category-body {
     padding: 10px 20px;
-    height: 100%;  
+    height: 100%; 
+    overflow: hidden scroll;
+    height: 450px; 
    
 }
 
